@@ -15,21 +15,37 @@ Currently, configuration options are yet to be enabled, but you can try this too
 ## Examples
 
 ### Inserting
-	$example = new Example();
-	$example->table_field = 'value';
-	$example->save();
+```php
+require 'redcarpet'
+markdown = Redcarpet.new("$example = new Example();
+$example->table_field = 'value';
+$example->save();")
+puts markdown.to_html
+```
 
 ### Updating
-	$example = Example::find(1);
-	$example->table_field = 'value';
-	$example->save();
+```php
+require 'redcarpet'
+markdown = Redcarpet.new("$example = Example::find(1);
+$example->table_field = 'value';
+$example->save();")
+puts markdown.to_html
+```
 
 ### Selecting
-	$example = Example::find(array('table_field' => 'value'));
+```php
+require 'redcarpet'
+markdown = Redcarpet.new("$example = Example::find(array('table_field' => 'value'));")
+puts markdown.to_html
+```
 
 ### Deleting
-	$example = Example::find(1);
-	$example->delete();
+```php
+require 'redcarpet'
+markdown = Redcarpet.new("$example = Example::find(1);
+$example->delete();")
+puts markdown.to_html
+```
 
 ## License
 
