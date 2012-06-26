@@ -1,0 +1,13 @@
+Release 1.0.0
+
+# What is this?
+
+This is a toolkit to perform Object Relational Mapping (ORM) for PHP. It is based on the popular ORM design pattern ActiveRecord.
+
+# Requirements
+
+This ORM requires at least PHP 5.3 and a working PDO database connection running a MySQL database. Support for other specifications may be enabled in the future. 
+
+# How do I use this?
+
+Currently, configuration options are yet to be enabled, but you can try this toolkit by configuring lib/Table.php to your connection. That'd be all there is to it.
