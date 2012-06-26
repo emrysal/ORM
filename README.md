@@ -25,9 +25,7 @@ Currently, configuration options are yet to be enabled, but you can try this too
 	$example->save();
 
 ### Selecting
-	$example = Example::find(array(
-		'where' => array('table_field' => 'value')
-	));
+	$example = Example::find(array('table_field' => 'value'));
 
 ### Deleting
 	$example = Example::find(1);
