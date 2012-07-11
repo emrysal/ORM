@@ -30,7 +30,7 @@ class SQLBuilder
 	}
 
 	public function __toString() {
-		$func = 'build_' . strtolower($this->_operation);
+		$func = '_build' . ucfirst(strtolower($this->_operation));
 		return $this->$func();
 	}
 	
@@ -131,7 +131,7 @@ class SQLBuilder
 		return $this;
 	}
 	
-	public function offset($offset) {
+	public function offset( $offset ) {
 		$this->_offset = intval($offset);
 		return $this;
 	}
@@ -141,12 +141,12 @@ class SQLBuilder
 		return is_numeric($str) ? $str : "'".$str."'";
 	}
 
-	private function build_insert() {
+	private function _buildInsert() {
 		$sql = "INSERT INTO $this->_table $this->_data";
 		return $sql;
 	}
 	
-	private function build_select() {
+	private function _buildSelect() {
 		
 		$sql = "SELECT $this->_select FROM `$this->_table`";
 		
@@ -177,7 +177,7 @@ class SQLBuilder
 		return $sql;
 	}
 	
-	private function build_update() {
+	private function _buildUpdate() {
 		
 		$sql = "UPDATE $this->_table SET $this->_data";
 		
@@ -196,7 +196,7 @@ class SQLBuilder
 		return $sql;
 	}
 	
-	private function build_delete() {
+	private function _buildDelete() {
 		
 		$sql = "DELETE FROM $this->_table";
 		

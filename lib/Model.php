@@ -10,7 +10,6 @@ class Model
 {	
 	private $_isNewRecord = true;
 	private $_isReadonly = false;
-	
 	private $_attributes = array();
 
 	static public $primaryKey;
@@ -19,24 +18,20 @@ class Model
 		static::table();
 	}
 	
-	public function __construct( array &$attrs = array(), $newRecord = true ) {
+	public function __construct( array $attrs = array(), $newRecord = true ) {
 		$this->_isNewRecord = $newRecord;
 		$this->_setAttributes( $attrs );
 	}
 	
-	public function _setAttributes( array &$attrs ) {
+	private function _setAttributes( array &$attrs ) {
 		
 		foreach ( $attrs as $key => $value ) {
 			$this->_attributes[$key] = $value;
 		}
 	}
 	
-	public static function table() {
+	static public function table() {
 		return Table::load(get_called_class());
-	}
-	
-	public function isNewRecord() {
-		return $this->_isNewRecord;
 	}
 	
 	static public function create( array $attributes ) {
@@ -50,7 +45,7 @@ class Model
 	
 	static public function findBySQL( $sql ) {
 		$this->_isNewRecord = false;
-		return static::table()->findBySQL( $sql );
+		return static::table()->select($sql);
 	}
 	
 	public function &__get($name)
@@ -78,9 +73,13 @@ class Model
 	}
 
 	// find object
-	static public function find(/*$mode, $options = false*/) {
+	static public function find() {
 
 		$args = func_get_args();
+
+		if ( func_num_args() === 0 ) {
+			$args[0] = 'all';
+		}
 
 		if ( $args[0] === 'all' || $args[0] === 'first' || $args[0] === 'last' ) {
 
@@ -104,55 +103,109 @@ class Model
 			 		$options['offset'] = 0;
 					break;
 			}
-		} else if ( is_numeric($args[0]) ) {
+		}
+		else if ( func_num_args() > 1 ) {
+			$options = array('where' => array($args[0] => $args[1]));
+		}
+		else if ( is_numeric($args[0]) ) {
 			$options = array('where' => array(static::table()->pk => $args[0]));
+		} else if ( $args[0] === 'all' || $args[0] === 'first' || $args[0] === 'last' ) {
+
+			if ( isset($args[1]) && is_array($args[1]) ) {
+				$options = $args[1];
+			} else {
+				$options = array();
+			}
+
+			switch ( $args[0]) {
+				
+				case 'all' :
+				    $options['select'] = '*';
+					break;
+	
+				// @todo: provide support for reversing order
+				case 'last' :
+					$options['order'] = static::table()->pk . ' DESC';
+				case 'first' :
+					$options['limit'] = 1;
+			 		$options['offset'] = 0;
+					break;
+			}
 		} else {
 			$options = $args[0];
 		}
-		return static::table()->find($options);
+		return static::table()->select($options);
 	}
 
 	// @todo
-	static public function count() { }
+	static public function count() { 
+
+		$args = func_get_args();
+		$options = array();
+
+		if ( func_num_args() > 1 ) {
+			$options['where'] = array($args[0] => $args[1]);
+		} else if ( isset($args[0]) && is_array($args[0]) ) {
+			$options = $args[0];
+		}
+		$options['select'] = 'COUNT(*)';
+
+		return static::table()->selectSingle($options);
+	}
 	
-	public function newRecord($value) {
-		$this->_isNewRecord = $value;
+	public function newRecord() {
+		$this->_isNewRecord = ( $this->_isNewRecord ) ? false : true;
+	}
+
+	public function isNewRecord() {
+		return $this->_isNewRecord;
+	}
+
+	public function readonly() {
+		$this->_isReadonly = ( $this->_isReadonly ) ? false : true;
 	}
 	
 	// @todo
-	public function save($validate = true) { 
-		$ret = $this->isNewRecord() ? $this->_insert($validate) : $this->_update($validate);
-		return $ret;
+	public function save( $validate = true ) { 
+	
+		echo $this->name;
+
+		$result = false;
+
+		if ( $this->isNewRecord() ) {
+			if ( $result = $this->_insert($validate) ) {
+				$this->newRecord();
+			}
+		} else { 
+			$result = $this->_update($validate);
+		}
+		return $result;
 	}
 	
 	// @todo: validate
 	private function _insert( $validate = true ) {
-		$table = static::table()->insert($this->_attributes);
+		return static::table()->insert($this->_attributes);
 	}
 	
 	private function _update( $validate = true ) {
-		$table = static::table()->update($this->_attributes, array($this->table()->pk => $this->_attributes[$this->table()->pk]));
+		return static::table()->update($this->_attributes, array($this->table()->pk => $this->_attributes[$this->table()->pk]));
 	}
 	
 	// Remove object
-	public function delete() {
-		return static::table()->delete(array('where' => array($this->table()->pk => $this->_attributes[$this->table()->pk])));
+	static public function delete( array $options = array() ) {
+		return static::table()->delete($options); 
 	}
 	
-	static public function deleteAll() {
-		return static::table()->deleteAll();
-	}
 
-	// alias for find('all');
+	// alias for find(); for clarity
 	static public function all() {
-		return static::find('all'); //call_user_func_array('$this->find', array_merge(array('all'), func_get_args()));
+		return static::find();
 	}
 
-	// @todo
-	static public function first() { 
-		return static::find('first');
+	static public function first( array $options = array() ) { 
+		return static::find('first', $options);
 	}
-	static public function last() { 
-		return static::find('last');
+	static public function last( array $options = array() ) { 
+		return static::find('last', $options);
 	}
 }
