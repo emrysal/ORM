@@ -24,7 +24,6 @@ class Model
 	}
 	
 	private function _setAttributes( array &$attrs ) {
-		
 		foreach ( $attrs as $key => $value ) {
 			$this->_attributes[$key] = $value;
 		}
