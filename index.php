@@ -4,10 +4,7 @@
 **  @author Dregian
 **  @date 2012-06-24
 **/
-require_once('lib/SQLBuilder.php');
-require_once('lib/Table.php');
-require_once('lib/Model.php');
-
+require_once('lib/ORM.php');
 require_once('models/Example.php');
 
 use ORM\Example;
